@@ -1,9 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../../../core/constants/constant_color.dart';
-import '../login_form/login_form.dart';
-import '../sign_up_form/sign_up_form.dart';
+import '../../auth/login_form/login_form.dart';
+import '../../auth/sign_up_form/sign_up_form.dart';
 
 class LoginRegisterCombineScreen extends StatefulWidget {
   const LoginRegisterCombineScreen({super.key});

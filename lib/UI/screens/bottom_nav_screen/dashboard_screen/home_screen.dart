@@ -1,7 +1,5 @@
-
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-
 import '../../../../core/constants/constant_color.dart';
 import '../../../components/custom_items.dart';
 import 'categories/BagsCategory/bag_screen.dart';

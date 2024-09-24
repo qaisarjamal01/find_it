@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-import '../bottom_nav_screen/profile_screen/login_register_combine_screen/login_register_combine_screen.dart';
+import '../auth/login_register_combine_screen/login_register_combine_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

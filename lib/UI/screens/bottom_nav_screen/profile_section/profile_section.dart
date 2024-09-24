@@ -5,8 +5,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../../core/constants/constant_color.dart';
 import '../../../components/custom_container.dart';
 import '../../../components/custom_profile_list_tile.dart';
-import '../profile_screen/login_form/login_form.dart';
-import '../profile_screen/sign_up_form/sign_up_form.dart';
+
+import '../../auth/login_form/login_form.dart';
+import '../../auth/sign_up_form/sign_up_form.dart';
 import 'PrivacyPolicyScreen/privacy_policy_screen.dart';
 
 class ProfileSection extends StatefulWidget {
