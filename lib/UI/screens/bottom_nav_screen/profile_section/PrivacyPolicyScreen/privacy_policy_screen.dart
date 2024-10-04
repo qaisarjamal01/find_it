@@ -38,7 +38,6 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                   'd.Safety & Security:\n   We may use your information to prevent\n   fraud, enforce our policies, and protect\n   our community.',style: TextStyle(fontSize: 18)),
               Text('3. Sharing Your Information',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
               Text('    We do not sell or rent your personal\n    information. However, we may share\n    your information:\n'
-
                   'a.With Other Users: Your name, contact information, and item details will be shared with users who are either looking for or reporting an item.'
                   'Third-Party Services: We may use trusted third-party services (e.g., for analytics or payment processing) that access limited data under strict confidentiality agreements.'
         'Legal Requirements: We may share your information if required by law, to protect our rights, or to prevent illegal activities.',style: TextStyle(fontSize: 18)),

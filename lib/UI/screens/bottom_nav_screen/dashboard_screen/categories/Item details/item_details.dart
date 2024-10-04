@@ -23,7 +23,7 @@ class _ItemDetailsState extends State<ItemDetails> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(widget.image,height: 30.h,width: double.infinity,fit: BoxFit.cover,),
+          Image.network(widget.image,height: 30.h,width: double.infinity,fit: BoxFit.cover,),
           Text(widget.title,style: TextStyle(fontSize: 4.h),),
           Text(widget.location,style: TextStyle(fontSize: 4.h),),
           Text(widget.date,style: TextStyle(fontSize: 4.h),),

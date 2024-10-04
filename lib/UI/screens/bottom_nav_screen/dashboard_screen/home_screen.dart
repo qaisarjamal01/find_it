@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:find_it/UI/screens/bottom_nav_screen/profile_section/update_products.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../../core/constants/constant_color.dart';
@@ -55,6 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
   @override
   Widget build(BuildContext context) {
+    String? docId ;
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
     return Scaffold(
         backgroundColor: ConstantColors.orangeShade,
       appBar: AppBar(
@@ -117,34 +123,155 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text('All Items',style: TextStyle(fontSize: 0.26.dp),),
           ),
           Expanded(
-            child: ListView.builder(
-                itemCount: items.length,
-                itemBuilder: (context,index){
-              final item =  items[index];
-              return ListTile(
-                leading: Image.asset(item.image,height: 30.h,width: 18.w,),
-                title: Text(item.title),
-                subtitle: Text(item.location),
-                trailing: Column(
-                  children: [
-                    Text(item.date),
-                    SizedBox(height: 1.h,),
-                    InkWell(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (_)=>ItemDetails(
-                            image: item.image,
-                            title: item.title,
-                            location: item.location,
-                            date: item.date,
-                          )));
-                        },
-                        child: Text('view details',style: TextStyle(color: Color(0xffFFA500),fontSize: 0.2.dp),))
-                  ],
-                ),
-              );
-            }),
+            flex: 1,
+            child: StreamBuilder(stream: FirebaseFirestore.instance.collection('lostItems').snapshots(),
+                builder: (context,AsyncSnapshot<QuerySnapshot> snapshot){
+                  if(snapshot.hasError){
+                    return Text('error');
+                  }
+                  if(snapshot.connectionState == ConnectionState.waiting){
+                    return Center(child: CupertinoActivityIndicator(),);
+                  }
+                  if(snapshot.data!.docs.isEmpty){
+                    return Text('no data found');
+                  }
+                  if(snapshot != null && snapshot.data!=null){
+                    return ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context,index){
+                          final item = items[index];
+                          return ListTile(
+                            leading: Image.network(snapshot.data!.docs[index]['image_url'],height: 30.h,width: 18.w,),
+                            title: Text(snapshot.data!.docs[index]['ItemName']),
+                            subtitle: Text(snapshot.data!.docs[index]['location']),
+                            trailing: SizedBox(
+                              width: width * 0.3,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(snapshot.data!.docs[index]['date']),
+                                      SizedBox(width: width * 0.059,),
+                                      InkWell(
+                                          onTap: (){
+                                            Navigator.push(context, MaterialPageRoute(builder: (_) => UpdateProducts(itemName: snapshot.data!.docs[index]['ItemName'], categoryName: snapshot.data!.docs[index]['categoryName'], location: snapshot.data!.docs[index]['location'], date: snapshot.data!.docs[index]['date'], description: snapshot.data!.docs[index]['description'], docId: snapshot.data!.docs[index].id,)));
+                                          },
+                                          child: Icon(Icons.edit_note)),
+                                    ],
+                                  ),
+                                  SizedBox(height: height * 0.005),
+                                  Row(
+                                    children: [
+                                      InkWell(
+                                          onTap: (){
+                                            Navigator.push(context, MaterialPageRoute(builder: (_)=>ItemDetails(
+                                              image: snapshot.data!.docs[index]['image_url'],
+                                              title: snapshot.data!.docs[index]['ItemName'],
+                                              location: snapshot.data!.docs[index]['location'],
+                                              date: snapshot.data!.docs[index]['date'],
+                                            )));
+                                          },
+                                          child: Text('view details',style: TextStyle(color: Color(0xffFFA500),fontSize: 0.2.dp),)),
+                                      SizedBox(width: width * 0.04),
+                                      InkWell (
+                                          onTap: () async {
+                                            docId = snapshot.data!.docs[index].id;
+                                            try {
+                                              await FirebaseFirestore.instance.collection('lostItems').doc(docId).delete();
+                                              print('document deleted successfully');
+                                            } catch (error) {
+                                              print('Error deleting document: $error');
+                                            }
+                                          },
+
+                                          child: Icon(Icons.delete))
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        });
+                  }
+                  return CupertinoActivityIndicator();
+                })
+          ),
+          Expanded(
+            flex: 1,
+            child: StreamBuilder(stream: FirebaseFirestore.instance.collection('foundItems').snapshots(),
+                builder: (context,AsyncSnapshot<QuerySnapshot> snapshot){
+                  if(snapshot.hasError){
+                    return Text('error');
+                  }
+                  if(snapshot.connectionState == ConnectionState.waiting){
+                    return Center(child: CupertinoActivityIndicator(),);
+                  }
+                  if(snapshot.data!.docs.isEmpty){
+                    return Text('no data found');
+                  }
+                  if(snapshot != null && snapshot.data!=null){
+                    return ListView.builder(
+                        itemCount: snapshot.data!.docs.length,
+                        itemBuilder: (context,index){
+                          final item = items[index];
+                          return ListTile(
+                            leading: Image.network(snapshot.data!.docs[index]['image_url'],height: 30.h,width: 18.w,),
+                            title: Text(snapshot.data!.docs[index]['ItemName']),
+                            subtitle: Text(snapshot.data!.docs[index]['location']),
+                            trailing: SizedBox(
+                              width: width * 0.3,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(snapshot.data!.docs[index]['date']),
+                                      SizedBox(width: width * 0.059,),
+                                      InkWell(
+                                          onTap: (){
+                                            Navigator.push(context, MaterialPageRoute(builder: (_) => UpdateProducts(itemName: snapshot.data!.docs[index]['ItemName'], categoryName: snapshot.data!.docs[index]['categoryName'], location: snapshot.data!.docs[index]['location'], date: snapshot.data!.docs[index]['date'], description: snapshot.data!.docs[index]['description'], docId: snapshot.data!.docs[index].id,)));
+                                          },
+                                          child: Icon(Icons.edit_note)),
+                                    ],
+                                  ),
+                                  SizedBox(height: height * 0.005),
+                                  Row(
+                                    children: [
+                                      InkWell(
+                                          onTap: (){
+                                            Navigator.push(context, MaterialPageRoute(builder: (_)=>ItemDetails(
+                                              image: snapshot.data!.docs[index]['image_url'],
+                                              title: snapshot.data!.docs[index]['ItemName'],
+                                              location: snapshot.data!.docs[index]['location'],
+                                              date: snapshot.data!.docs[index]['date'],
+                                            )));
+                                          },
+                                          child: Text('view details',style: TextStyle(color: Color(0xffFFA500),fontSize: 0.2.dp),)),
+                                      SizedBox(width: width * 0.04),
+                                      InkWell (
+                                          onTap: () async {
+                                            docId = snapshot.data!.docs[index].id;
+                                            try {
+                                              await FirebaseFirestore.instance.collection('foundItems').doc(docId).delete();
+                                              print('document deleted successfully');
+                                            } catch (error) {
+                                              print('Error deleting document: $error');
+                                            }
+                                          },
+
+                                          child: Icon(Icons.delete))
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        });
+                  }
+                  return CupertinoActivityIndicator();
+                }),
           )
     ]
       ));
   }
 }
+

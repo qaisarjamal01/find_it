@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/constants/constant_color.dart';
 import '../../../components/custom_container.dart';
 import '../../../components/custom_row_divider.dart';
@@ -20,18 +21,23 @@ class SignUpForm extends StatefulWidget {
 }
 
 class _SignUpFormState extends State<SignUpForm> {
-  SignUpUser(String userName,String userEmail,String userContact, String userPassword,String userConfirmPassword)async{
+
+  SignUpUser(String userName,String userEmail,String userContact,String userRole, String userPassword,String userConfirmPassword)async{
     User? currentUser = FirebaseAuth.instance.currentUser;
     try {
       await FirebaseFirestore.instance.collection('users').doc(currentUser!.uid).set({
         'userName': userName,
         'userEmail':userEmail,
         'userContact':userContact,
+        'userRole': userRole,
         'userPassword':userPassword,
-        'userConfirmPassword':userConfirmPassword
+        'userConfirmPassword':userConfirmPassword,
+        'image_url' : '',
           }).then((value)=>{
-
       });
+      SharedPreferences sp = await SharedPreferences.getInstance();
+      sp.setString('userName', userName);
+      print(sp.getString('userName'));
     }
     on FirebaseAuthException catch(e) {
       print('error $e');
@@ -89,8 +95,10 @@ class _SignUpFormState extends State<SignUpForm> {
                       signUpProvider.userNameController.text.trim(),
                       signUpProvider.userEmailController.text.trim(),
                       signUpProvider.userContactController.text.trim(),
+                      'user',
                       signUpProvider.userPasswordController.text.trim(),
-                      signUpProvider.userConfirmPasswordController.text.trim()
+                      signUpProvider.userConfirmPasswordController.text.trim(),
+
                     )
                  });
                   Navigator.push(context, MaterialPageRoute(builder: (_)=>BottomNavigationBarScreen()));

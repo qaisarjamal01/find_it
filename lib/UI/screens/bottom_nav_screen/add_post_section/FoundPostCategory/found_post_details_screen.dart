@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_it/UI/screens/bottom_nav_screen/dashboard_screen/categories/Found/found_items.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,17 +14,49 @@ class FoundPostDetailsScreen extends StatefulWidget {
   const FoundPostDetailsScreen({super.key});
 
   @override
-  State<FoundPostDetailsScreen> createState() => _FoundPostDetailsState();
+  State<FoundPostDetailsScreen> createState() => _FoundPostDetailsScreen();
 }
 
-class _FoundPostDetailsState extends State<FoundPostDetailsScreen> {
-  // Function to upload found item details to Firestore
-  Future<void> FoundItems(
+class _FoundPostDetailsScreen extends State<FoundPostDetailsScreen> {
+  String imageUrl = '';
+  XFile? file ;
+  // Function to upload lost item details to Firestore
+  // Function to upload lost item details to Firestore
+
+  Future<void> uploadImage () async{
+    if(file == null)return;
+
+    //unique name for image
+    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+
+    //uploading image to firebase
+    //firebase storage instance
+    Reference referenceRoot = FirebaseStorage.instance.ref();
+
+    //create folder for images
+    Reference referenceDirImages = referenceRoot.child('images');
+
+    //give pic a unique name
+    Reference imageToUpload = referenceDirImages.child(uniqueFileName);
+
+    //upload image to Firebase
+    try{
+      await imageToUpload.putFile(File(file!.path));
+      imageUrl = await imageToUpload.getDownloadURL();
+      print(imageUrl);
+    }catch (e){
+      print(e);
+    }
+
+  }
+
+  Future<void> foundItems(
       String itemName,
       String categoryName,
       String location,
       String date,
       String description,
+      String url
       ) async {
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
@@ -32,23 +65,29 @@ class _FoundPostDetailsState extends State<FoundPostDetailsScreen> {
       return;
     }
 
-    String userId = currentUser.uid;
-
     try {
-      await FirebaseFirestore.instance.collection('foundItems').doc(userId).set({
+      if(imageUrl.isEmpty){
+
+      }
+      // Upload the item details regardless of whether an image is uploaded
+      await FirebaseFirestore.instance.collection('foundItems').doc().set({
         'ItemName': itemName,
         'categoryName': categoryName,
         'location': location,
         'date': date,
         'description': description,
+        'user_id' : FirebaseAuth.instance.currentUser!.uid,
+        'image_url': url, // This will be empty if no image is uploaded
         // Add any other fields you need
       });
+
       print('Found item details uploaded successfully!');
     } on FirebaseException catch (e) {
       print('Failed to upload found item details: $e');
       // Optionally, show an error message to the user
     }
   }
+
 
   // Function to open the date picker with previous month dates disabled
   Future<void> _selectDate(BuildContext context) async {
@@ -76,70 +115,6 @@ class _FoundPostDetailsState extends State<FoundPostDetailsScreen> {
     }
   }
 
-  File? _image;
-  final picker= ImagePicker();
-  Future getImageGallery()async{
-    final pickedFile= await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if(pickedFile !=null){
-        _image = File(pickedFile.path);
-      }
-      else{
-        print("no image select");
-      }
-    });
-  }
-  Future getcameraImage()async{
-    final pickedFile= await picker.pickImage(source: ImageSource.camera);
-    setState(() {
-      if(pickedFile !=null){
-        _image = File(pickedFile.path);
-      }
-      else{
-        print("no image select");
-      }
-    });
-  }
-  void dialog(context){
-    showDialog
-      (context: context,
-        builder: (BuildContext context){
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            content: Container(
-              height: 130,
-              child: Column(
-                children: [
-                  InkWell(
-                    onTap: (){
-                      getcameraImage();
-                      Navigator.pop(context);
-                    },
-                    child: ListTile(
-                      leading: Icon(Icons.camera_alt_rounded),
-                      title: Text("Camera"),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: (){
-                      getImageGallery();
-                      Navigator.pop(context);
-                    },
-                    child: ListTile(
-                      leading: Icon(Icons.photo),
-                      title: Text("Gallary"),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
-  }
-
-
   String? selectedCity; // Holds the selected value from the dropdown
   String? selectedCategory;
   bool isOtherSelected = false; // Determines if 'Other' is selected
@@ -165,8 +140,10 @@ class _FoundPostDetailsState extends State<FoundPostDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String? docId;
+
     double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width; // Fix width calculation
+    double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: ConstantColors.orangeShade,
@@ -420,8 +397,42 @@ class _FoundPostDetailsState extends State<FoundPostDetailsScreen> {
                           ),
                           child: Center(
                             child: InkWell(
-                              onTap: (){
-                                dialog(context);
+                              onTap: ()async{
+                                //image picker
+                                ImagePicker imagePicker = ImagePicker();
+                                file = await imagePicker.pickImage(source: ImageSource.gallery);
+                                print(file!.path);
+
+                                uploadImage();
+                                // if(file == null)return;
+                                //
+                                // //unique name for image
+                                // String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+                                //
+                                // //uploading image to firebase
+                                // //firebase storage instance
+                                // Reference referenceRoot = FirebaseStorage.instance.ref();
+                                //
+                                // //create folder for images
+                                // Reference referenceDirImages = referenceRoot.child('images');
+                                //
+                                // //give pic a unique name
+                                // Reference imageToUpload = referenceDirImages.child(uniqueFileName);
+                                //
+                                // //upload image to Firebase
+                                // try{
+                                //   await imageToUpload.putFile(File(file!.path));
+                                //   imageUrl = await imageToUpload.getDownloadURL();
+                                //   print(imageUrl);
+                                // }catch (e){
+                                //   print(e);
+                                // }
+
+                                //add link to the specific user doc
+                                // FirebaseFirestore.instance.collection('lostItems').doc(docId).update(
+                                //     {
+                                //       'image': imageUrl,
+                                //     }).then((value) => {Get.back()});
                               },
                               child: Text(
                                 'Upload Image',
@@ -450,7 +461,7 @@ class _FoundPostDetailsState extends State<FoundPostDetailsScreen> {
                       ),
                       child: Center(
                         child: InkWell(
-                          onTap: () {
+                          onTap: () async {
                             // Validate required fields
                             if (itemNameController.text.trim().isEmpty) {
                               Get.snackbar('Error',
@@ -503,36 +514,55 @@ class _FoundPostDetailsState extends State<FoundPostDetailsScreen> {
                               location = selectedCity!;
                             }
 
-                            // Call the FoundItems function with all necessary data
-                            FoundItems(
-                              itemNameController.text.trim(),
-                              selectedCategory!,
-                              location,
-                              dateController.text.trim(),
-                              descriptionController.text.trim(),
-                            ).then((_) {
-                              // Optionally, navigate the user to another screen or show a success message
-                              Get.snackbar('Success',
-                                  'Found item details published successfully!',
-                                  backgroundColor: Colors.green,
-                                  colorText: Colors.white);
-                              // Clear the form or navigate as needed
-                              itemNameController.clear();
-                              setState(() {
-                                selectedCategory = null;
-                                selectedCity = null;
-                                isOtherSelected = false;
+                            // Call the LostItems function with all necessary data
+                            print("imageUrl $imageUrl");
+                            if(imageUrl.isEmpty && file != null)  {
+                              await  uploadImage();
+
+                            }
+                            if(imageUrl.isNotEmpty){
+                              foundItems(
+                                itemNameController.text.trim(),
+                                selectedCategory!,
+                                location,
+                                dateController.text.trim(),
+                                descriptionController.text.trim(),
+                                imageUrl,
+                              ).then((value){
+                                Navigator.pop(context);
                               });
-                              dateController.clear();
-                              descriptionController.clear();
-                              otherCityController.clear();
-                            }).catchError((error) {
-                              // Handle any errors
-                              Get.snackbar('Error',
-                                  'Failed to publish found item details.',
-                                  backgroundColor: Colors.red,
-                                  colorText: Colors.white);
-                            });
+                            }
+
+                            //   LostItems(
+                            //     itemNameController.text.trim(),
+                            //     selectedCategory!,
+                            //     location,
+                            //     dateController.text.trim(),
+                            //     descriptionController.text.trim(),
+                            //     imageUrl,
+                            //   ).then((_) {
+                            //     // Optionally, navigate the user to another screen or show a success message
+                            //     Get.snackbar('Success',
+                            //         'Lost item details published successfully!',
+                            //         backgroundColor: Colors.green,
+                            //         colorText: Colors.white);
+                            //     // Clear the form or navigate as needed
+                            //     itemNameController.clear();
+                            //     // setState(() {
+                            //     //   selectedCategory = null;
+                            //     //   selectedCity = null;
+                            //     //   isOtherSelected = false;
+                            //     // });
+                            //     dateController.clear();
+                            //     descriptionController.clear();
+                            //     otherCityController.clear();
+                            //   }).catchError((error) {
+                            //     // Handle any errors
+                            //     Get.snackbar('Error',
+                            //         'Failed to publish lost item details.',
+                            //         backgroundColor: Colors.red,
+                            //         colorText: Colors.white);
+                            //   });
                           },
                           child: Text(
                             'Publish',

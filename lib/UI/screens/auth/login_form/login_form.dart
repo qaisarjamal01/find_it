@@ -1,6 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:find_it/UI/screens/auth/forget_password_screen/reset_password.dart';
+import 'package:find_it/UI/screens/auth/login_form/roll_base.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/constants/constant_color.dart';
 import '../../../components/custom_container.dart';
 import '../../../components/custom_row_divider.dart';
@@ -19,6 +24,16 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  //final FirebaseAuth auth = FirebaseAuth.instance;
+
+ //  Future<void> getUserData() async{
+ //    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser!.uid).get();
+ // String userName = userDoc.get('userName');
+ //
+ // SharedPreferences sp = await SharedPreferences.getInstance();
+ // sp.setString('userName', userName);
+ //  }
+  
   @override
   Widget build(BuildContext context) {
     double size = MediaQuery.of(context).size.height;
@@ -42,7 +57,12 @@ class _LoginFormState extends State<LoginForm> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('Forgot Password?',style: TextStyle(color: Color(0xffFFA500),fontSize: 0.29.dp),),
+              child: InkWell(
+                  onTap: (){
+                    //resetPassword(context);
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => ResetPassword()));
+                  },
+                  child: Text('Forgot Password?',style: TextStyle(color: Color(0xffFFA500),fontSize: 0.29.dp),)),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -75,15 +95,17 @@ class _LoginFormState extends State<LoginForm> {
                       await FirebaseAuth.instance.signInWithEmailAndPassword(
                         email: email,
                         password: password,
+
                       );
+                      AuthCheck().checkUserRoleAndNavigate(context);
 
                       // If successful, navigate to BottomNavigationBarScreen
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => BottomNavigationBarScreen(),
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (_) => BottomNavigationBarScreen(),
+                      //   ),
+                      // );
                     } catch (e) {
                       // Show error message if login fails
                       showDialog(

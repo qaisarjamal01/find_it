@@ -3,6 +3,7 @@ import 'package:find_it/UI/screens/bottom_nav_screen/bottom_navigation_bar_provi
 import 'package:find_it/UI/screens/splash_screen/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
@@ -12,11 +13,16 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(ResponsiveSizer(
-    builder: (context,orientation,screenType){
-      return MyApp();
-    },
-  ));
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    //DeviceOrientation.portraitDown,
+  ]).then((_){
+    runApp(ResponsiveSizer(
+      builder: (context,orientation,screenType){
+        return MyApp();
+      },
+    ));
+  });
 }
 
 class MyApp extends StatelessWidget {

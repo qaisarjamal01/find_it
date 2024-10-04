@@ -4,58 +4,34 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import '../../../../../core/constants/constant_color.dart';
-import '../../dashboard_screen/home_screen.dart';
+import '../../../../core/constants/constant_color.dart';
+import '../dashboard_screen/home_screen.dart';
 
-class LostPostDetailsScreen extends StatefulWidget {
-  const LostPostDetailsScreen({super.key});
+class UpdateProducts extends StatefulWidget {
+  String itemName;
+  String categoryName;
+  String location;
+  String date;
+  String description;
+  String docId;
+    UpdateProducts({required this.docId, required this.description, required this.itemName,required this.categoryName,required this.location,required this.date, super.key});
 
   @override
-  State<LostPostDetailsScreen> createState() => _LostPostDetailsScreenState();
+  State<UpdateProducts> createState() => _UpdateProductsState();
 }
 
-class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
+class _UpdateProductsState extends State<UpdateProducts> {
   String imageUrl = '';
-  XFile? file ;
   // Function to upload lost item details to Firestore
-  // Function to upload lost item details to Firestore
-
-  Future<void> uploadImage () async{
-    if(file == null)return;
-
-    //unique name for image
-    String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
-
-    //uploading image to firebase
-    //firebase storage instance
-    Reference referenceRoot = FirebaseStorage.instance.ref();
-
-    //create folder for images
-    Reference referenceDirImages = referenceRoot.child('images');
-
-    //give pic a unique name
-    Reference imageToUpload = referenceDirImages.child(uniqueFileName);
-
-    //upload image to Firebase
-    try{
-      await imageToUpload.putFile(File(file!.path));
-      imageUrl = await imageToUpload.getDownloadURL();
-      print(imageUrl);
-    }catch (e){
-      print(e);
-    }
-
-  }
-
-  Future<void> LostItems(
+  Future<void> UpdateProducts(
       String itemName,
       String categoryName,
       String location,
       String date,
       String description,
-      String url
       ) async {
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) {
@@ -65,20 +41,17 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
     }
 
     try {
-      if(imageUrl.isEmpty){
-
+      if(imageUrl.isNotEmpty){
+        await FirebaseFirestore.instance.collection('lostItems').doc(widget.docId).update({
+          'ItemName': itemName,
+          'categoryName': categoryName,
+          'location': location,
+          'date': date,
+          'description': description,
+          'image_url' : imageUrl,
+          // Add any other fields you need
+        });
       }
-      // Upload the item details regardless of whether an image is uploaded
-      await FirebaseFirestore.instance.collection('lostItems').doc().set({
-        'ItemName': itemName,
-        'categoryName': categoryName,
-        'location': location,
-        'date': date,
-        'description': description,
-        'user_id' : FirebaseAuth.instance.currentUser!.uid,
-        'image_url': url, // This will be empty if no image is uploaded
-        // Add any other fields you need
-      });
 
       print('Lost item details uploaded successfully!');
     } on FirebaseException catch (e) {
@@ -86,8 +59,6 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
       // Optionally, show an error message to the user
     }
   }
-
-
   // Function to open the date picker with previous month dates disabled
   Future<void> _selectDate(BuildContext context) async {
     final DateTime now = DateTime.now(); // Current date
@@ -136,14 +107,12 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
     descriptionController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     String? docId;
-
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-
+    print(widget.categoryName);
     return Scaffold(
       backgroundColor: ConstantColors.orangeShade,
       appBar: AppBar(
@@ -185,7 +154,7 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: TextFormField(
-                    controller: itemNameController,
+                    controller: itemNameController..text = widget.itemName,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.drive_file_rename_outline),
                       hintText: 'Item Name',
@@ -220,7 +189,7 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
                               borderSide: BorderSide(color: Color(0xffFFA500)),
                             ),
                           ),
-                          value: selectedCategory, // Set initial value if needed
+                          value:  widget.categoryName , // Set initial value if needed
                           items: [
                             DropdownMenuItem(
                                 value: 'Mobiles', child: Text('Mobiles')),
@@ -262,7 +231,7 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
                               borderSide: BorderSide(color: Color(0xffFFA500)),
                             ),
                           ),
-                          value: selectedCity, // Set initial value if needed
+                          value: widget.location, // Set initial value if needed
                           items: [
                             DropdownMenuItem(
                                 value: 'Peshawar', child: Text('Peshawar')),
@@ -328,7 +297,7 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: TextFormField(
-                          controller: dateController,
+                          controller: dateController..text = widget.date,
                           readOnly: true,
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.date_range_outlined),
@@ -342,6 +311,7 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
                                 borderSide: BorderSide(
                                     color: Color(0xffFFA500))),
                           ),
+                        //  initialValue: widget.date,
                           onTap: () {
                             _selectDate(context);
                           },
@@ -360,7 +330,7 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: TextFormField(
-                          controller: descriptionController,
+                          controller: descriptionController..text = widget.description,
                           decoration: InputDecoration(
                             prefixIcon: Icon(Icons.description),
                             hintText: 'Description',
@@ -399,39 +369,38 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
                               onTap: ()async{
                                 //image picker
                                 ImagePicker imagePicker = ImagePicker();
-                                 file = await imagePicker.pickImage(source: ImageSource.gallery);
+                                XFile? file = await imagePicker.pickImage(source: ImageSource.gallery);
                                 print(file!.path);
 
-                                uploadImage();
-                                // if(file == null)return;
-                                //
-                                // //unique name for image
-                                // String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
-                                //
-                                // //uploading image to firebase
-                                // //firebase storage instance
-                                // Reference referenceRoot = FirebaseStorage.instance.ref();
-                                //
-                                // //create folder for images
-                                // Reference referenceDirImages = referenceRoot.child('images');
-                                //
-                                // //give pic a unique name
-                                // Reference imageToUpload = referenceDirImages.child(uniqueFileName);
-                                //
-                                // //upload image to Firebase
-                                // try{
-                                //   await imageToUpload.putFile(File(file!.path));
-                                //   imageUrl = await imageToUpload.getDownloadURL();
-                                //   print(imageUrl);
-                                // }catch (e){
-                                //   print(e);
-                                // }
+                                if(file == null)return;
+
+                                //unique name for image
+                                String uniqueFileName = DateTime.now().millisecondsSinceEpoch.toString();
+
+                                //uploading image to firebase
+                                //firebase storage instance
+                                Reference referenceRoot = FirebaseStorage.instance.ref();
+
+                                //create folder for images
+                                Reference referenceDirImages = referenceRoot.child('images');
+
+                                //give pic a unique name
+                                Reference imageToUpload = referenceDirImages.child(uniqueFileName);
+
+                                //upload image to Firebase
+                                try{
+                                  await imageToUpload.putFile(File(file.path));
+                                  imageUrl = await imageToUpload.getDownloadURL();
+                                  print(imageUrl);
+                                }catch (e){
+                                  print(e);
+                                }
 
                                 //add link to the specific user doc
-                                // FirebaseFirestore.instance.collection('lostItems').doc(docId).update(
-                                //     {
-                                //       'image': imageUrl,
-                                //     }).then((value) => {Get.back()});
+                                FirebaseFirestore.instance.collection('lostItems').doc(docId.toString()).update(
+                                    {
+                                      'image': imageUrl,
+                                    }).then((value) => {Get.back()});
                               },
                               child: Text(
                                 'Upload Image',
@@ -460,7 +429,7 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
                       ),
                       child: Center(
                         child: InkWell(
-                          onTap: () async {
+                          onTap: () {
                             // Validate required fields
                             if (itemNameController.text.trim().isEmpty) {
                               Get.snackbar('Error',
@@ -469,20 +438,20 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
                                   colorText: Colors.white);
                               return;
                             }
-                            if (selectedCategory == null) {
-                              Get.snackbar('Error',
-                                  'Please select a category.',
-                                  backgroundColor: Colors.red,
-                                  colorText: Colors.white);
-                              return;
-                            }
-                            if (selectedCity == null) {
-                              Get.snackbar('Error',
-                                  'Please select a location.',
-                                  backgroundColor: Colors.red,
-                                  colorText: Colors.white);
-                              return;
-                            }
+                            // if (selectedCategory == null) {
+                            //   Get.snackbar('Error',
+                            //       'Please select a category.',
+                            //       backgroundColor: Colors.red,
+                            //       colorText: Colors.white);
+                            //   return;
+                            // }
+                            // if (selectedCity == null) {
+                            //   Get.snackbar('Error',
+                            //       'Please select a location.',
+                            //       backgroundColor: Colors.red,
+                            //       colorText: Colors.white);
+                            //   return;
+                            // }
                             if (dateController.text.trim().isEmpty) {
                               Get.snackbar('Error',
                                   'Please select a date.',
@@ -499,72 +468,54 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
                             }
 
                             // Determine the location
-                            String location;
-                            if (isOtherSelected) {
-                              if (otherCityController.text.trim().isEmpty) {
-                                Get.snackbar('Error',
-                                    'Please enter a city name.',
-                                    backgroundColor: Colors.red,
-                                    colorText: Colors.white);
-                                return;
-                              }
-                              location = otherCityController.text.trim();
-                            } else {
-                              location = selectedCity!;
-                            }
+                            //String location;
+                            // if (isOtherSelected) {
+                            //   if (otherCityController.text.trim().isEmpty) {
+                            //     Get.snackbar('Error',
+                            //         'Please enter a city name.',
+                            //         backgroundColor: Colors.red,
+                            //         colorText: Colors.white);
+                            //     return;
+                            //   }
+                            //   location = otherCityController.text.trim();
+                            // } else {
+                               String location = selectedCity!;
+                            // }
 
                             // Call the LostItems function with all necessary data
-                            print("imageUrl $imageUrl");
-                            if(imageUrl.isEmpty && file != null)  {
-                             await  uploadImage();
-
-                            }
-                            if(imageUrl.isNotEmpty){
-                              LostItems(
-                                itemNameController.text.trim(),
-                                selectedCategory!,
-                                location,
-                                dateController.text.trim(),
-                                descriptionController.text.trim(),
-                                imageUrl,
-                              ).then((value){
-                                Navigator.pop(context);
+                            UpdateProducts(
+                              itemNameController.text.trim(),
+                              selectedCategory!,
+                              location,
+                              dateController.text.trim(),
+                              descriptionController.text.trim(),
+                            ).then((_) {
+                              // // Optionally, navigate the user to another screen or show a success message
+                              // Get.snackbar('Success',
+                              //     'Lost item details published successfully!',
+                              //     backgroundColor: Colors.green,
+                              //     colorText: Colors.white);
+                              // Clear the form or navigate as needed
+                              itemNameController.clear();
+                              setState(() {
+                                selectedCategory = null;
+                                selectedCity = null;
+                                isOtherSelected = false;
                               });
-                            }
+                              dateController.clear();
+                              descriptionController.clear();
+                              otherCityController.clear();
+                            }).catchError((error) {
+                              // Handle any errors
+                              Get.snackbar('Error',
+                                  'Failed to publish lost item details.',
+                                  backgroundColor: Colors.red,
+                                  colorText: Colors.white);
+                            });
 
-                          //   LostItems(
-                          //     itemNameController.text.trim(),
-                          //     selectedCategory!,
-                          //     location,
-                          //     dateController.text.trim(),
-                          //     descriptionController.text.trim(),
-                          //     imageUrl,
-                          //   ).then((_) {
-                          //     // Optionally, navigate the user to another screen or show a success message
-                          //     Get.snackbar('Success',
-                          //         'Lost item details published successfully!',
-                          //         backgroundColor: Colors.green,
-                          //         colorText: Colors.white);
-                          //     // Clear the form or navigate as needed
-                          //     itemNameController.clear();
-                          //     // setState(() {
-                          //     //   selectedCategory = null;
-                          //     //   selectedCity = null;
-                          //     //   isOtherSelected = false;
-                          //     // });
-                          //     dateController.clear();
-                          //     descriptionController.clear();
-                          //     otherCityController.clear();
-                          //   }).catchError((error) {
-                          //     // Handle any errors
-                          //     Get.snackbar('Error',
-                          //         'Failed to publish lost item details.',
-                          //         backgroundColor: Colors.red,
-                          //         colorText: Colors.white);
-                          //   });
                           },
                           child: Text(
-                            'Publish',
+                            'Update',
                             style: TextStyle(
                                 color: Color(0xffFFFFFF),
                                 fontSize: 0.3.dp,
@@ -581,5 +532,6 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
         ),
       ),
     );
+
   }
 }
