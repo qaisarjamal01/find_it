@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-
 import '../../../../../../core/constants/constant_color.dart';
 
 class ItemDetails extends StatefulWidget {

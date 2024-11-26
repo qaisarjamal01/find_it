@@ -1,17 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_it/UI/screens/auth/forget_password_screen/reset_password.dart';
+import 'package:find_it/UI/screens/auth/login_form/login_provider.dart';
 import 'package:find_it/UI/screens/auth/login_form/roll_base.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/constants/constant_color.dart';
 import '../../../components/custom_container.dart';
 import '../../../components/custom_row_divider.dart';
 import '../../../components/custom_social_container.dart';
 import '../../../components/custom_text_form_field.dart';
-import '../../bottom_nav_screen/bottom_navigation_bar_screen.dart';
 import '../sign_up_form/sign_up_form.dart';
 
 class LoginForm extends StatefulWidget {
@@ -22,8 +21,7 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+
   //final FirebaseAuth auth = FirebaseAuth.instance;
 
  //  Future<void> getUserData() async{
@@ -36,6 +34,7 @@ class _LoginFormState extends State<LoginForm> {
   
   @override
   Widget build(BuildContext context) {
+    final loginProvider = Provider.of<LoginProvider>(context);
     double size = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: ConstantColors.orangeShade,
@@ -49,11 +48,11 @@ class _LoginFormState extends State<LoginForm> {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: CustomTextFormField(hintText: 'Email', label: 'Email', decoration: InputDecoration(), controller: emailController,),
+              child: CustomTextFormField(hintText: 'Email', label: 'Email', decoration: InputDecoration(), controller: loginProvider.emailController,),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: CustomTextFormField(hintText: 'Password', label: 'Password', decoration: InputDecoration(), controller: passwordController,),
+              child: CustomTextFormField(hintText: 'Password', label: 'Password', decoration: InputDecoration(), controller: loginProvider.passwordController,),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -68,8 +67,8 @@ class _LoginFormState extends State<LoginForm> {
               padding: const EdgeInsets.all(8.0),
               child: InkWell(
                   onTap: () async {
-                    String email = emailController.text.trim();
-                    String password = passwordController.text.trim();
+                    String email = loginProvider.emailController.text.trim();
+                    String password = loginProvider.passwordController.text.trim();
 
                     if (email.isEmpty || password.isEmpty) {
                       // Show an alert dialog if fields are empty

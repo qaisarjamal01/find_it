@@ -7,8 +7,8 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import '../../../../core/constants/constant_color.dart';
-import '../dashboard_screen/home_screen.dart';
+import '../../../../../core/constants/constant_color.dart';
+import '../../dashboard_screen/home_screen.dart';
 
 class UpdateProducts extends StatefulWidget {
   String itemName;

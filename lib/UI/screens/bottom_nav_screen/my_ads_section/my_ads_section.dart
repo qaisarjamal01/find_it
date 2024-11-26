@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../../core/constants/constant_color.dart';
 import '../dashboard_screen/categories/Item details/item_details.dart';
-import '../profile_section/update_products.dart';
+import '../profile_section/UpdateProductsScreen/update_products.dart';
 
 class MyAdsSection extends StatefulWidget {
   const MyAdsSection({super.key});

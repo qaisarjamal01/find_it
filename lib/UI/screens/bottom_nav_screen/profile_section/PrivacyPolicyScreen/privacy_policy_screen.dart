@@ -1,6 +1,4 @@
-
-import 'package:flutter/material.dart';
-
+import'package:flutter/material.dart';
 import '../../../../../core/constants/constant_color.dart';
 
 class PrivacyPolicyScreen extends StatefulWidget {

@@ -79,7 +79,6 @@ class _LostPostDetailsScreenState extends State<LostPostDetailsScreen> {
         'image_url': url, // This will be empty if no image is uploaded
         // Add any other fields you need
       });
-
       print('Lost item details uploaded successfully!');
     } on FirebaseException catch (e) {
       print('Failed to upload lost item details: $e');

@@ -2,10 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-
 import '../../../../../../core/constants/constant_color.dart';
 import '../../../../../components/custom_items.dart';
-import '../../../profile_section/update_products.dart';
+import '../../../profile_section/UpdateProductsScreen/update_products.dart';
 import '../Item details/item_details.dart';
 
 class FoundItems extends StatefulWidget {
@@ -92,51 +91,21 @@ class _FoundItemsState extends State<FoundItems> {
                             leading: Image.network(snapshot.data!.docs[index]['image_url'],height: 30.h,width: 18.w,),
                             title: Text(snapshot.data!.docs[index]['ItemName']),
                             subtitle: Text(snapshot.data!.docs[index]['location']),
-                            trailing: SizedBox(
-                              width: width * 0.3,
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(snapshot.data!.docs[index]['date']),
-                                      SizedBox(width: width * 0.059,),
-                                      InkWell(
-                                          onTap: (){
-                                            Navigator.push(context, MaterialPageRoute(builder: (_) => UpdateProducts(itemName: snapshot.data!.docs[index]['ItemName'], categoryName: snapshot.data!.docs[index]['categoryName'], location: snapshot.data!.docs[index]['location'], date: snapshot.data!.docs[index]['date'], description: snapshot.data!.docs[index]['description'], docId: snapshot.data!.docs[index].id,)));
-                                          },
-                                          child: Icon(Icons.edit_note)),
-                                    ],
-                                  ),
-                                  SizedBox(height: height * 0.005),
-                                  Row(
-                                    children: [
-                                      InkWell(
-                                          onTap: (){
-                                            Navigator.push(context, MaterialPageRoute(builder: (_)=>ItemDetails(
-                                              image: item.image,
-                                              title: item.title,
-                                              location: item.location,
-                                              date: item.date,
-                                            )));
-                                          },
-                                          child: Text('view details',style: TextStyle(color: Color(0xffFFA500),fontSize: 0.2.dp),)),
-                                      SizedBox(width: width * 0.04),
-                                      InkWell (
-                                          onTap: () async {
-                                            docId = snapshot.data!.docs[index].id;
-                                            try {
-                                              await FirebaseFirestore.instance.collection('foundItems').doc(docId).delete();
-                                              print('document deleted successfully');
-                                            } catch (error) {
-                                              print('Error deleting document: $error');
-                                            }
-                                          },
-
-                                          child: Icon(Icons.delete))
-                                    ],
-                                  ),
-                                ],
-                              ),
+                            trailing: Column(
+                              children: [
+                                Text(snapshot.data!.docs[index]['date']),
+                                SizedBox(height: height * 0.014),
+                                InkWell(
+                                    onTap: (){
+                                      Navigator.push(context, MaterialPageRoute(builder: (_)=>ItemDetails(
+                                        image: item.image,
+                                        title: item.title,
+                                        location: item.location,
+                                        date: item.date,
+                                      )));
+                                    },
+                                    child: Text('view details',style: TextStyle(color: Color(0xffFFA500),fontSize: 0.2.dp),)),
+                              ],
                             ),
                           );
                         });

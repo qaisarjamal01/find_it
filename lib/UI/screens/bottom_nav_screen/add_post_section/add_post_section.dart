@@ -1,7 +1,5 @@
-
-import 'package:flutter/material.dart';
+import'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-
 import '../../../../core/constants/constant_color.dart';
 import 'FoundPostCategory/found_post_details_screen.dart';
 import 'LostPostCategory/lost_post_details_screen.dart';
@@ -47,7 +45,6 @@ class _AddPostSectionState extends State<AddPostSection> {
                   TextButton(onPressed: (){
                     Navigator.push(context, MaterialPageRoute(builder: (_)=>FoundPostDetailsScreen()));
                   }, child: Text('Found',style: TextStyle(color: Color(0xffFFA500),fontSize: 3.h,fontWeight: FontWeight.bold),))
-
                 ],
               )
             ],

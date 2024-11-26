@@ -1,21 +1,16 @@
-
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:find_it/UI/screens/bottom_nav_screen/profile_section/account_details.dart';
-import 'package:find_it/UI/screens/bottom_nav_screen/profile_section/contact_information.dart';
-import 'package:find_it/UI/screens/bottom_nav_screen/profile_section/update_password.dart';
+import 'package:find_it/UI/screens/bottom_nav_screen/profile_section/AccountDetailsScreen/account_details.dart';
+import 'package:find_it/UI/screens/bottom_nav_screen/profile_section/ContactInformationScreen/contact_information.dart';
+import 'package:find_it/UI/screens/bottom_nav_screen/profile_section/UpdatePasswordScreen/update_password.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../../core/constants/constant_color.dart';
 import '../../../components/custom_container.dart';
 import '../../../components/custom_profile_list_tile.dart';
-
 import '../../auth/login_form/login_form.dart';
 import '../../auth/sign_up_form/sign_up_form.dart';
 import 'PrivacyPolicyScreen/privacy_policy_screen.dart';

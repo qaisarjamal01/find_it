@@ -3,16 +3,16 @@ import 'package:find_it/UI/screens/bottom_nav_screen/profile_section/profile_sec
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'add_post_section/add_post_section.dart';
-import 'chat_section/chat_section.dart';
+import 'admin_section/admin_section.dart';
 import 'dashboard_screen/home_screen.dart';
 import 'my_ads_section/my_ads_section.dart';
 
 class BottomNavigationBarProvider with ChangeNotifier{
   List<TabItem> items = [
     TabItem(icon: Icons.home,title: 'Home'),
-    TabItem(icon: Icons.ads_click,title: 'My ads'),
+    TabItem(icon: Icons.update,title: 'updation'),
     TabItem(icon: Icons.add,title: 'add post'),
-    TabItem(icon: Icons.chat_bubble,title: 'chats'),
+    TabItem(icon: Icons.admin_panel_settings_sharp,title: 'admin'),
     TabItem(icon: Icons.person,title: 'profile')
   ];
 
@@ -23,7 +23,7 @@ class BottomNavigationBarProvider with ChangeNotifier{
     HomeScreen(),
     MyAdsSection(),
     AddPostSection(),
-    ChatSection(),
+    AdminSection(),
     ProfileSection()
   ];
 
